@@ -17,7 +17,7 @@ instance Pretty Term where
 instance Pretty Continuation where
     pretty (CntVar v) = v
     pretty (CntMu v cmd) = "~μ " <> v <> "." <> pretty cmd
-    pretty (CntCallStack tm cnt) = "(" <> pretty tm <> " . " <> pretty cnt <> ")"
+    pretty (CntCallStack tm cnt) = "(" <> pretty tm <> " · " <> pretty cnt <> ")"
     pretty CntTop = "□"
  
 instance Pretty Command where
