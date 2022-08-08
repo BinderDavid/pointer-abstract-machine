@@ -5,6 +5,7 @@ import System.Environment (getArgs)
 import AbstractMachine
 import Pretty
 import Syntax
+import System.Exit (exitSuccess)
 
 -- Examples
 
@@ -28,6 +29,9 @@ runCommand :: MachineState -> IO ()
 runCommand ms = do
     putStrLn (pretty ms)
     _ <- getLine
-    let ms' = computeStep ms
-    runCommand ms'
+    case computeStep ms of
+        Left err -> do
+            putStrLn err
+            exitSuccess
+        Right ms' -> runCommand ms'
 
