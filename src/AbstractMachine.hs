@@ -3,12 +3,18 @@ module AbstractMachine where
 
 import Syntax
 
--- The pointer abstract machine
+-------------------------------------------------------------------------------
+-- The Pointer Abstract Machine
+-------------------------------------------------------------------------------
 
--- The Stack
+-------------------------------------------------------------------------------
+-- The stack
+-------------------------------------------------------------------------------
 
+-- | A pointer into the stack
 type Pointer = Int
 
+-- | The stack contains bindings for both terms and continuations.
 data StackBinding where
   TermBinding :: Term -> Pointer -> StackBinding
   ContinuationBinding :: Continuation -> Pointer -> StackBinding
@@ -18,26 +24,33 @@ newtype Stack = MkStack { unStack :: [(Var, StackBinding)] }
 emptyStack :: Stack
 emptyStack = MkStack []
 
+-- | Get a pointer to the top of the stack.
 topOfStack :: Stack -> Pointer
 topOfStack stack = length (unStack stack)
 
+-- | Pop from the top of the stack until you reach the pointer.
 restrictStack :: Stack -> Pointer -> Stack
-restrictStack stack pt = MkStack (take pt $ unStack stack)
+restrictStack stack pt = MkStack (take (length stack' - pt) stack')
+  where
+    stack' = unStack stack
 
+-- | Push a binding on top of the stack.
 extendStack :: Stack -> Var -> StackBinding -> Stack
 extendStack stack var bnd = MkStack $ (var, bnd) : unStack stack
 
--- The Machine
+-------------------------------------------------------------------------------
+-- The machine state
+-------------------------------------------------------------------------------
 
 data MachineState = MkMachineState Term Pointer Continuation Pointer Stack
 
-lookupStack :: Pointer -> Stack -> Var -> StackBinding
+lookupStack :: Pointer -> Stack -> Var -> Either String StackBinding
 lookupStack pt stack = lookupStack' (restrictStack stack pt)
   where
-    lookupStack' :: Stack -> Var -> StackBinding
-    lookupStack' (MkStack []) var = error ("Variable " <> var <> " not in stack.")
-    lookupStack' (MkStack ((v,bnd):stack')) v' | v == v' = bnd
-                                              | otherwise = lookupStack' (MkStack stack') v'
+    lookupStack' :: Stack -> Var -> Either String StackBinding
+    lookupStack' (MkStack []) var = Left ("Variable " <> var <> " not in stack.")
+    lookupStack' (MkStack ((v,bnd):stack')) v' | v == v' = Right bnd
+                                               | otherwise = lookupStack' (MkStack stack') v'
 
 embedCommand :: Command -> MachineState
 embedCommand (Cut tm cnt) = MkMachineState tm 0 cnt 0 emptyStack
@@ -54,13 +67,15 @@ computeStep (MkMachineState (TmMu x (Cut tm cont)) _p1 cont' p2 stack) =
 computeStep (MkMachineState tm' p1 (CntMu x (Cut tm cnt)) _p2 stack) =
     Right (MkMachineState tm (topOfStack stack) cnt (topOfStack stack) (extendStack stack x (TermBinding tm' p1)))
 -- Evaluating producer variables
-computeStep (MkMachineState (TmVar x) p1 cnt p2 stack) =
-    case lookupStack p1 stack x of
+computeStep (MkMachineState (TmVar x) p1 cnt p2 stack) = do
+    res <- lookupStack p1 stack x
+    case res of
         TermBinding tm p -> Right (MkMachineState tm p cnt p2 stack)
         ContinuationBinding _ _ -> Left "Tried to lookup term but found continuation"
 -- Evaluating consumer variables
-computeStep (MkMachineState tm p1 (CntVar x) p2 stack) =
-    case lookupStack p2 stack x of
+computeStep (MkMachineState tm p1 (CntVar x) p2 stack) = do
+    res <- lookupStack p2 stack x
+    case res of
         ContinuationBinding cnt p -> Right (MkMachineState tm p1 cnt p stack)
         TermBinding _ _ -> Left "Tried to lookup continuation but found term"
 computeStep (MkMachineState _ _ CntTop _ _) = Left "Computation finished."
