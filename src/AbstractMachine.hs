@@ -44,7 +44,6 @@ embedCommand (Cut tm cnt) = MkMachineState tm 0 cnt 0 emptyStack
 
 computeStep :: MachineState -> Either String MachineState
 -- Reducing a cut between a lambda abstraction and a call stack
-computeStep (MkMachineState _ _ CntTop _ _) = Left "Computation finished."
 computeStep (MkMachineState (TmLambda x funbody) _p1 (CntCallStack funarg cont) p2 stack) =
     Right (MkMachineState funbody (topOfStack stack) cont p2 (MkStack $ (x, TermBinding funarg p2) : unStack stack))
 -- Reducing mu abstractions. This implements CBV since they are evaluated before
@@ -64,6 +63,7 @@ computeStep (MkMachineState tm p1 (CntVar x) p2 stack) =
     case lookupStack p2 stack x of
         ContinuationBinding cnt p -> Right (MkMachineState tm p1 cnt p stack)
         TermBinding _ _ -> Left "Tried to lookup continuation but found term"
+computeStep (MkMachineState _ _ CntTop _ _) = Left "Computation finished."
 
 garbageCollection :: MachineState -> MachineState
 garbageCollection (MkMachineState tm p1 cnt p2 stack) =

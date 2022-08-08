@@ -9,8 +9,19 @@ import System.Exit (exitSuccess)
 
 -- Examples
 
+-- | \x.x
+idTm :: Term
+idTm = TmLambda "x" (TmVar "x")
+
+-- | \x.x
 ex1 :: Command
-ex1 = Cut (TmLambda "x" (TmVar "x")) CntTop
+ex1 = Cut idTm CntTop
+
+-- | (\x.x) (\x.x)
+-- = mu alpha. < (\x.x) | (\lambda x.x) . alpha
+ex2 :: Command
+ex2 = Cut (TmMu "alpha" (Cut idTm (CntCallStack idTm (CntVar "alpha")))) CntTop
+
 
 -- Command line argument logic
 
@@ -21,6 +32,7 @@ main = do
 
 run :: [String] -> IO ()
 run ["ex1"] = runCommand (embedCommand ex1)
+run ["ex2"] = runCommand (embedCommand ex2)
 run _ = putStrLn "Unknown argument"
 
 -- Running an example
