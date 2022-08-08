@@ -31,8 +31,8 @@ main = do
     run args
 
 run :: [String] -> IO ()
-run ["ex1"] = putStrLn ("Computing command " <> pretty ex1) >> runCommand (embedCommand ex1)
-run ["ex2"] = putStrLn ("Computing command " <> pretty ex2) >> runCommand (embedCommand ex2)
+run ["ex1"] = putStrLn ("\nComputing command " <> pretty ex1 <> "\n") >> runCommand (embedCommand ex1)
+run ["ex2"] = putStrLn ("\nComputing command " <> pretty ex2 <> "\n") >> runCommand (embedCommand ex2)
 run _ = putStrLn "Unknown argument"
 
 -- Running an example
