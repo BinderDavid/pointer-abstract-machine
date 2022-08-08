@@ -19,3 +19,6 @@ instance Pretty Continuation where
  
 instance Pretty Command where
     pretty (Cut tm cnt) = "< " <> pretty tm <> " | " <> pretty cnt <> " >"
+
+-- Prettyprinting Abstract Machines
+

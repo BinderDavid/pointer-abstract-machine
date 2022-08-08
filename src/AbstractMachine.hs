@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs #-}
-module Lib where
+module AbstractMachine where
 
 import Syntax
 
