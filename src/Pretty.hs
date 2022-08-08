@@ -2,7 +2,6 @@ module Pretty where
 
 import Syntax
 import AbstractMachine
-import Text.Read (Lexeme(String))
 
 -- Prettyprinting Syntax
 
@@ -30,10 +29,10 @@ instance Pretty StackBinding where
     pretty (ContinuationBinding cnt pt) = pretty cnt <> "{" <> show pt <> "}"
 
 prettyStack :: Pointer -> Pointer -> Stack -> String
-prettyStack pt1 pt2 (MkStack stack) = unlines (printStackEntry pt1 pt2 <$> reverse (zip [0..] (reverse stack)))
+prettyStack pt1 pt2 (MkStack stack) = unlines (printStackEntry <$> reverse (zip [0..] (reverse stack)))
       where
-        printStackEntry :: Pointer -> Pointer -> (Int, (Var, StackBinding)) -> String
-        printStackEntry pt1 pt2 (i, (var, bnd)) = "│" <> printTermPt pt1 i <> printContinuationPt pt2 i <> show i <> " ⟼ " <> var <> " : " <> pretty bnd
+        printStackEntry :: (Int, (Var, StackBinding)) -> String
+        printStackEntry (i, (var, bnd)) = "│" <> printTermPt pt1 i <> printContinuationPt pt2 i <> show i <> " ⟼ " <> var <> " : " <> pretty bnd
 
         printTermPt :: Pointer -> Int -> String
         printTermPt pt i | pt == i = " • "
