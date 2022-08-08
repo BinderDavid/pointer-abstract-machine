@@ -17,6 +17,7 @@ instance Pretty Continuation where
     pretty (CntVar v) = v
     pretty (CntMu v cmd) = "~mu " <> v <> "." <> pretty cmd
     pretty (CntCallStack tm cnt) = "(" <> pretty tm <> " . " <> pretty cnt <> ")"
+    pretty CntTop = "TOP"
  
 instance Pretty Command where
     pretty (Cut tm cnt) = "< " <> pretty tm <> " | " <> pretty cnt <> " >"

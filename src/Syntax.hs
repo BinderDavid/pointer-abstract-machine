@@ -12,6 +12,7 @@ data Continuation where
   CntVar :: Var -> Continuation
   CntMu :: Var -> Command -> Continuation
   CntCallStack :: Term -> Continuation -> Continuation
+  CntTop :: Continuation
 
 data Command where
   Cut :: Term -> Continuation -> Command

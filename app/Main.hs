@@ -10,7 +10,7 @@ import System.Exit (exitSuccess)
 -- Examples
 
 ex1 :: Command
-ex1 = Cut (TmLambda "x" (TmVar "x")) (CntVar "alpha")
+ex1 = Cut (TmLambda "x" (TmVar "x")) CntTop
 
 -- Command line argument logic
 
