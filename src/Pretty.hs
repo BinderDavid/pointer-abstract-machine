@@ -10,14 +10,14 @@ class Pretty a where
 
 instance Pretty Term where
     pretty (TmVar v) = v
-    pretty (TmMu v cmd) = "mu " <> v <> "." <> pretty cmd
-    pretty (TmLambda x tm) = "\\" <> x <> "." <> pretty tm
+    pretty (TmMu v cmd) = "μ " <> v <> "." <> pretty cmd
+    pretty (TmLambda x tm) = "λ" <> x <> "." <> pretty tm
 
 instance Pretty Continuation where
     pretty (CntVar v) = v
-    pretty (CntMu v cmd) = "~mu " <> v <> "." <> pretty cmd
+    pretty (CntMu v cmd) = "~μ " <> v <> "." <> pretty cmd
     pretty (CntCallStack tm cnt) = "(" <> pretty tm <> " . " <> pretty cnt <> ")"
-    pretty CntTop = "TOP"
+    pretty CntTop = "□"
  
 instance Pretty Command where
     pretty (Cut tm cnt) = "< " <> pretty tm <> " | " <> pretty cnt <> " >"
@@ -32,7 +32,7 @@ instance Pretty Stack where
     pretty (MkStack stack) = unlines (printStackEntry <$> (zip [0..] stack))
       where
         printStackEntry :: (Int, (Var, StackBinding)) -> String
-        printStackEntry (i, (var, bnd)) = show i <> " -> " <> var <> "," <> pretty bnd
+        printStackEntry (i, (var, bnd)) = show i <> " ⟼ " <> var <> " : " <> pretty bnd
 
 instance Pretty MachineState where
     pretty (MkMachineState tm pt1 cnt pt2 stack) =
