@@ -87,7 +87,12 @@ computeStep (MkMachineState tm p1 (CntVar x) p2 stack) = do
         TermBinding _ _ -> Left "Tried to lookup continuation but found term"
 computeStep (MkMachineState _ _ CntTop _ _) = Left "Computation finished."
 
-garbageCollection :: MachineState -> MachineState
-garbageCollection (MkMachineState tm p1 cnt p2 stack) =
-    MkMachineState tm p1 cnt p2 (restrictStack stack (max p1 p2))
+-------------------------------------------------------------------------------
+-- Garbage collection / Stack popping
+-------------------------------------------------------------------------------
+
+-- | Returns Just if the stack has been restricted, Nothing otherwise.
+garbageCollection :: MachineState -> Maybe MachineState
+garbageCollection (MkMachineState tm p1 cnt p2 stack) | max p1 p2 < topOfStack stack = Just (MkMachineState tm p1 cnt p2 (restrictStack stack (max p1 p2)))
+                                                      | otherwise = Nothing
 
