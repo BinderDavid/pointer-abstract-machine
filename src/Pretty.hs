@@ -2,6 +2,7 @@ module Pretty where
 
 import Syntax
 import AbstractMachine
+import Text.Read (Lexeme(String))
 
 -- Prettyprinting Syntax
 
@@ -28,19 +29,28 @@ instance Pretty StackBinding where
     pretty (TermBinding tm pt) = pretty tm <> "{" <> show pt <> "}"
     pretty (ContinuationBinding cnt pt) = pretty cnt <> "{" <> show pt <> "}"
 
-instance Pretty Stack where
-    pretty (MkStack stack) = unlines (printStackEntry <$> reverse (zip [0..] (reverse stack)))
+prettyStack :: Pointer -> Pointer -> Stack -> String
+prettyStack pt1 pt2 (MkStack stack) = unlines (printStackEntry pt1 pt2 <$> reverse (zip [0..] (reverse stack)))
       where
-        printStackEntry :: (Int, (Var, StackBinding)) -> String
-        printStackEntry (i, (var, bnd)) = show i <> " ⟼ " <> var <> " : " <> pretty bnd
+        printStackEntry :: Pointer -> Pointer -> (Int, (Var, StackBinding)) -> String
+        printStackEntry pt1 pt2 (i, (var, bnd)) = printTermPt pt1 i <> printContinuationPt pt2 i <> show i <> " ⟼ " <> var <> " : " <> pretty bnd
+
+        printTermPt :: Pointer -> Int -> String
+        printTermPt pt i | pt == i = " • "
+                         | otherwise = "   "
+
+        printContinuationPt :: Pointer -> Int -> String
+        printContinuationPt pt i | pt == i = " • "
+                                 | otherwise = "   "
+
 
 instance Pretty MachineState where
     pretty (MkMachineState tm pt1 cnt pt2 stack) =
         unlines [ "------------------------------------------------------------"
-                , "Term Closure: " <> pretty tm <> "{" <> show pt1 <> "}"
-                , "Continuation Closure: " <> pretty cnt <> "{" <> show pt2 <> "}"
+                , "Term: " <> pretty tm <> "{" <> show pt1 <> "}"
+                , "Cont: " <> pretty cnt <> "{" <> show pt2 <> "}"
                 , "Stack:"
-                , pretty stack
+                , prettyStack pt1 pt2 stack
                 , "------------------------------------------------------------"
                 ]
 
