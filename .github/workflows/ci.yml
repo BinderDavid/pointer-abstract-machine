@@ -1,0 +1,37 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  stack:
+    name: stack / ghc ${{ matrix.ghc }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        stack: ["2.7.3"]
+        ghc: ["8.10.7"]
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: haskell/actions/setup@v1
+      name: Setup Haskell Stack
+      with:
+        ghc-version: ${{ matrix.ghc }}
+        stack-version: ${{ matrix.stack }}
+
+    - uses: freckle/stack-cache-action@main
+      with:
+        prefix: ${{ runner.os }}-${{ matrix.ghc }}
+
+    - name: Build
+      run: |
+        stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks
+    - name: Test
+      run: |
+        stack test --system-ghc
