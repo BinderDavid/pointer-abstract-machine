@@ -9,13 +9,20 @@ import Syntax
 -- Examples
 
 ex1 :: Command
-ex1 = undefined
+ex1 = Cut (TmLambda "x" (TmVar "x")) (CntVar "alpha")
 
-run :: [String] -> IO ()
-run ["ex1"] = pure ()
-run _ = "Unknown argument"
+-- Command line argument logic
 
 main :: IO ()
 main = do
     args <- getArgs
     run args
+
+run :: [String] -> IO ()
+run ["ex1"] = runCommand ex1
+run _ = putStrLn "Unknown argument"
+
+-- Running an example
+
+runCommand :: Command -> IO ()
+runCommand _ = putStrLn "runCommand not implemented"
