@@ -1,22 +1,7 @@
 {-# LANGUAGE GADTs #-}
 module Lib where
 
--- Terms, Contexts and Commands
-
-type Var = String
-
-data Term where
-  TmVar :: Var -> Term
-  TmMu :: Var -> Command -> Term
-  TmLambda :: Var -> Term -> Term
-
-data Continuation where
-  CntVar :: Var -> Continuation
-  CntMu :: Var -> Command -> Continuation
-  CntCallStack :: Term -> Continuation -> Continuation
-
-data Command where
-  Cut :: Term -> Continuation -> Command
+import Syntax
 
 -- The pointer abstract machine
 

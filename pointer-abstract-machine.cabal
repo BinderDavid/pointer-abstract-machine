@@ -22,6 +22,8 @@ source-repository head
 library
   exposed-modules:
       Lib
+      Syntax
+      Pretty
   other-modules:
       Paths_pointer_abstract_machine
   hs-source-dirs:
