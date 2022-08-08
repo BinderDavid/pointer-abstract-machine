@@ -29,7 +29,7 @@ instance Pretty StackBinding where
     pretty (ContinuationBinding cnt pt) = pretty cnt <> "{" <> show pt <> "}"
 
 instance Pretty Stack where
-    pretty (MkStack stack) = unlines (printStackEntry <$> (zip [0..] stack))
+    pretty (MkStack stack) = unlines (printStackEntry <$> reverse (zip [0..] (reverse stack)))
       where
         printStackEntry :: (Int, (Var, StackBinding)) -> String
         printStackEntry (i, (var, bnd)) = show i <> " ⟼ " <> var <> " : " <> pretty bnd
