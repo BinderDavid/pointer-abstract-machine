@@ -32,7 +32,12 @@ extendStack stack var bnd = MkStack $ (var, bnd) : unStack stack
 data MachineState = MkMachineState Term Pointer Continuation Pointer Stack
 
 lookupStack :: Pointer -> Stack -> Var -> StackBinding
-lookupStack = undefined
+lookupStack pt stack = lookupStack' (restrictStack stack pt)
+  where
+    lookupStack' :: Stack -> Var -> StackBinding
+    lookupStack' (MkStack []) var = error ("Variable " <> var <> " not in stack.")
+    lookupStack' (MkStack ((v,bnd):stack)) v' | v == v' = bnd
+                                              | otherwise = lookupStack' (MkStack stack) v'
 
 embedCommand :: Command -> MachineState
 embedCommand (Cut tm cnt) = MkMachineState tm 0 cnt 0 emptyStack
