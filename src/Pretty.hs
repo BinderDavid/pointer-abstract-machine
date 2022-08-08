@@ -44,3 +44,9 @@ instance Pretty MachineState where
                 , "------------------------------------------------------------"
                 ]
 
+instance Pretty ComputeStep where
+    pretty LambdaStep = "Evaluated a cut between a lambda expression and a call stack."
+    pretty MuStep = "Evaluated a cut between a mu abstraction and a continuation."
+    pretty MuTildeStep = "Evaluated a cut between a term and a tilde mu abstraction."
+    pretty TermVarStep = "Evaluated a term variable by looking up the value in the stack."
+    pretty ContinuationVarStep = "Evaluated a continuation variable by looking up the value in the stack."

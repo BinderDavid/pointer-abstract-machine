@@ -45,5 +45,7 @@ runCommand ms = do
         Left err -> do
             putStrLn err
             exitSuccess
-        Right ms' -> runCommand ms'
+        Right (ms', step) -> do
+            putStrLn (pretty step)
+            runCommand ms'
 
