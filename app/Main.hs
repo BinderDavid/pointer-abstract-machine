@@ -19,10 +19,10 @@ main = do
     run args
 
 run :: [String] -> IO ()
-run ["ex1"] = runCommand ex1
+run ["ex1"] = runCommand (embedCommand ex1)
 run _ = putStrLn "Unknown argument"
 
 -- Running an example
 
-runCommand :: Command -> IO ()
-runCommand _ = putStrLn "runCommand not implemented"
+runCommand :: MachineState -> IO ()
+runCommand ms = putStrLn (pretty ms)

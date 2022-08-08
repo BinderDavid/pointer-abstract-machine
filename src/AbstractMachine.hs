@@ -5,48 +5,61 @@ import Syntax
 
 -- The pointer abstract machine
 
+-- The Stack
+
 type Pointer = Int
 
 data StackBinding where
   TermBinding :: Term -> Pointer -> StackBinding
   ContinuationBinding :: Continuation -> Pointer -> StackBinding
 
-type Stack = [(Var, StackBinding)]
+newtype Stack = MkStack { unStack :: [(Var, StackBinding)] }
 
 emptyStack :: Stack
-emptyStack = []
+emptyStack = MkStack []
 
-type MachineState = (Term, Pointer, Continuation, Pointer, Stack)
+topOfStack :: Stack -> Pointer
+topOfStack stack = length (unStack stack)
+
+restrictStack :: Stack -> Pointer -> Stack
+restrictStack stack pt = MkStack (take pt $ unStack stack)
+
+extendStack :: Stack -> Var -> StackBinding -> Stack
+extendStack stack var bnd = MkStack $ (var, bnd) : unStack stack
+
+-- The Machine
+
+data MachineState = MkMachineState Term Pointer Continuation Pointer Stack
 
 lookupStack :: Pointer -> Stack -> Var -> StackBinding
 lookupStack = undefined
 
 embedCommand :: Command -> MachineState
-embedCommand (Cut tm cnt) = (tm, 0, cnt, 0, emptyStack)
+embedCommand (Cut tm cnt) = MkMachineState tm 0 cnt 0 emptyStack
 
 computeStep :: MachineState -> MachineState
 -- Reducing a cut between a lambda abstraction and a call stack
-computeStep (TmLambda x funbody,_p1,CntCallStack funarg cont,p2,stack) =
-    (funbody, length stack, cont, p2, (x, TermBinding funarg p2) : stack)
+computeStep (MkMachineState (TmLambda x funbody) _p1 (CntCallStack funarg cont) p2 stack) =
+    MkMachineState funbody (topOfStack stack) cont p2 (MkStack $ (x, TermBinding funarg p2) : unStack stack)
 -- Reducing mu abstractions. This implements CBV since they are evaluated before
 -- mu-tilde abstractions.
-computeStep (TmMu x (Cut tm cont), _p1, cont', p2, stack) =
-    (tm, length stack, cont, length stack, (x, ContinuationBinding cont' p2) : stack)
+computeStep (MkMachineState (TmMu x (Cut tm cont)) _p1 cont' p2 stack) =
+    MkMachineState tm (topOfStack stack) cont (topOfStack stack) (extendStack stack x (ContinuationBinding cont' p2))
 -- Reducing tilde mu abstractions
-computeStep (tm', p1, CntMu x (Cut tm cnt), _p2, stack) =
-    (tm, length stack, cnt, length stack, (x, TermBinding tm' p1) : stack)
+computeStep (MkMachineState tm' p1 (CntMu x (Cut tm cnt)) _p2 stack) =
+    MkMachineState tm (topOfStack stack) cnt (topOfStack stack) (extendStack stack x (TermBinding tm' p1))
 -- Evaluating producer variables
-computeStep (TmVar x, p1, cnt, p2, stack) =
+computeStep (MkMachineState (TmVar x) p1 cnt p2 stack) =
     case lookupStack p1 stack x of
-        TermBinding tm p -> (tm, p, cnt, p2, stack)
+        TermBinding tm p -> MkMachineState tm p cnt p2 stack
         ContinuationBinding _ _ -> error "Tried to lookup term but found continuation"
 -- Evaluating consumer variables
-computeStep (tm , p1, CntVar x, p2, stack) =
+computeStep (MkMachineState tm p1 (CntVar x) p2 stack) =
     case lookupStack p2 stack x of
-        ContinuationBinding cnt p -> (tm, p1, cnt, p, stack)
+        ContinuationBinding cnt p -> MkMachineState tm p1 cnt p stack
         TermBinding _ _ -> error "Tried to lookup continuation but found term"
 
 garbageCollection :: MachineState -> MachineState
-garbageCollection (tm, p1, cnt, p2, stack) =
-    (tm, p1, cnt, p2, take (max p1 p2) stack)
+garbageCollection (MkMachineState tm p1 cnt p2 stack) =
+    MkMachineState tm p1 cnt p2 (restrictStack stack (max p1 p2))
 
