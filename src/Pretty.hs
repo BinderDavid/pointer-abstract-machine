@@ -33,7 +33,7 @@ prettyStack :: Pointer -> Pointer -> Stack -> String
 prettyStack pt1 pt2 (MkStack stack) = unlines (printStackEntry pt1 pt2 <$> reverse (zip [0..] (reverse stack)))
       where
         printStackEntry :: Pointer -> Pointer -> (Int, (Var, StackBinding)) -> String
-        printStackEntry pt1 pt2 (i, (var, bnd)) = printTermPt pt1 i <> printContinuationPt pt2 i <> show i <> " ⟼ " <> var <> " : " <> pretty bnd
+        printStackEntry pt1 pt2 (i, (var, bnd)) = "│" <> printTermPt pt1 i <> printContinuationPt pt2 i <> show i <> " ⟼ " <> var <> " : " <> pretty bnd
 
         printTermPt :: Pointer -> Int -> String
         printTermPt pt i | pt == i = " • "
@@ -44,14 +44,19 @@ prettyStack pt1 pt2 (MkStack stack) = unlines (printStackEntry pt1 pt2 <$> rever
                                  | otherwise = "   "
 
 
+horizontalLine :: String
+horizontalLine = "──────────────────────────────────────────────────────────"
+
+
 instance Pretty MachineState where
     pretty (MkMachineState tm pt1 cnt pt2 stack) =
-        unlines [ "------------------------------------------------------------"
-                , "Term: " <> pretty tm <> "{" <> show pt1 <> "}"
-                , "Cont: " <> pretty cnt <> "{" <> show pt2 <> "}"
-                , "Stack:"
-                , prettyStack pt1 pt2 stack
-                , "------------------------------------------------------------"
+        unlines [ "┌" <> horizontalLine 
+                , "│ Term: " <> pretty tm <> "{" <> show pt1 <> "}"
+                , "│ Cont: " <> pretty cnt <> "{" <> show pt2 <> "}"
+                , "├" <> horizontalLine
+                , "│ Stack:"
+                , if null (unStack stack) then "│" else init (prettyStack pt1 pt2 stack)
+                , "└" <> horizontalLine
                 ]
 
 instance Pretty ComputeStep where
