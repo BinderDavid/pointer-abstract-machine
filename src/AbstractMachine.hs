@@ -30,7 +30,7 @@ topOfStack stack = length (unStack stack)
 
 -- | Pop from the top of the stack until you reach the pointer.
 restrictStack :: Stack -> Pointer -> Stack
-restrictStack stack pt = MkStack (take (length stack' - pt) stack')
+restrictStack stack pt = MkStack $ reverse $ take (pt + 1) $ reverse stack'
   where
     stack' = unStack stack
 
