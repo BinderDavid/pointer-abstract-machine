@@ -53,7 +53,7 @@ lookupStack pt stack = lookupStack' (restrictStack stack pt)
                                                | otherwise = lookupStack' (MkStack stack') v'
 
 embedCommand :: Command -> MachineState
-embedCommand (Cut tm cnt) = MkMachineState tm 0 cnt 0 emptyStack
+embedCommand (Cut tm cnt) = MkMachineState tm (-1) cnt (-1) emptyStack
 
 data ComputeStep where
     LambdaStep :: ComputeStep
@@ -61,8 +61,12 @@ data ComputeStep where
     MuTildeStep :: ComputeStep
     TermVarStep :: ComputeStep
     ContinuationVarStep :: ComputeStep
+    GarbageCollectionStep :: ComputeStep
 
 computeStep :: MachineState -> Either String (MachineState, ComputeStep)
+-- Popping the top of the stack.
+computeStep (MkMachineState tm pt1 cnt pt2 stack) | max pt1 pt2 + 1 < topOfStack stack =
+    Right (MkMachineState tm pt1 cnt pt2 (restrictStack stack (max pt1 pt2)), GarbageCollectionStep)
 -- Reducing a cut between a lambda abstraction and a call stack
 computeStep (MkMachineState (TmLambda x funbody) _p1 (CntCallStack funarg cont) p2 stack) =
     Right (MkMachineState funbody (topOfStack stack) cont p2 (MkStack $ (x, TermBinding funarg p2) : unStack stack), LambdaStep)
@@ -86,13 +90,3 @@ computeStep (MkMachineState tm p1 (CntVar x) p2 stack) = do
         ContinuationBinding cnt p -> Right (MkMachineState tm p1 cnt p stack, ContinuationVarStep)
         TermBinding _ _ -> Left "Tried to lookup continuation but found term"
 computeStep (MkMachineState _ _ CntTop _ _) = Left "Computation finished."
-
--------------------------------------------------------------------------------
--- Garbage collection / Stack popping
--------------------------------------------------------------------------------
-
--- | Returns Just if the stack has been restricted, Nothing otherwise.
-garbageCollection :: MachineState -> Maybe MachineState
-garbageCollection (MkMachineState tm p1 cnt p2 stack) | max p1 p2 < topOfStack stack = Just (MkMachineState tm p1 cnt p2 (restrictStack stack (max p1 p2)))
-                                                      | otherwise = Nothing
-

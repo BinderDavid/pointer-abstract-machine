@@ -64,3 +64,4 @@ instance Pretty ComputeStep where
     pretty MuTildeStep = "Evaluated a cut between a term and a tilde mu abstraction."
     pretty TermVarStep = "Evaluated a term variable by looking up the value in the stack."
     pretty ContinuationVarStep = "Evaluated a continuation variable by looking up the value in the stack."
+    pretty GarbageCollectionStep = "Garbage collection: Popped the top of the stack."
