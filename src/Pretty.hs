@@ -44,7 +44,7 @@ prettyStack pt1 pt2 (MkStack stack) = unlines (printStackEntry <$> reverse (zip 
 
 
 horizontalLine :: String
-horizontalLine = "────────────────────────────────────────────────────────────────────────────"
+horizontalLine = "───────────────────────────────────────────────────────────────────────────────"
 
 
 instance Pretty MachineState where
