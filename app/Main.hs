@@ -67,20 +67,30 @@ main = do
 run :: [String] -> IO ()
 run [s] = case lookup s examples of
             Nothing -> putStrLn "Unknown argument"
-            Just ex ->  putStrLn ("\nComputing command " <> pretty ex <> "\n") >> runCommand (embedCommand ex)
+            Just cmd ->  runCommand cmd
 run _ = putStrLn "Unknown argument"
 
 -- Running an example
 
-runCommand :: MachineState -> IO ()
-runCommand ms = do
-    putStrLn (pretty ms)
+runCommand :: Command -> IO ()
+runCommand cmd = do
+    putStrLn ""
+    putStrLn ("Computing command " <> pretty cmd)
+    putStrLn ""
+    let initialState = embedCommand cmd
+    putStrLn "Initial State:"
+    putStrLn (pretty initialState)
+    runMachine 1 initialState
+
+runMachine :: Int -> MachineState -> IO ()
+runMachine n ms = do
     _ <- getLine
     case computeStep ms of
         Left err -> do
             putStrLn err
             exitSuccess
         Right (ms', step) -> do
-            putStrLn (pretty step)
-            runCommand ms'
+            putStrLn ("Step " <> show n <> ": " <> pretty step)
+            putStrLn (pretty ms')
+            runMachine (n + 1) ms'
 
