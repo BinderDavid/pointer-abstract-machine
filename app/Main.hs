@@ -33,6 +33,7 @@ ex4 = Cut (TmMu "α" (Cut idTm (CntMu "y" (Cut (TmVar "y")
                                   (CntMu "w" (Cut (TmVar "w") (CntVar "α")))))))))
           (CntMu "x" (Cut (TmVar "x") CntTop))
 
+-- the same as ex4, but all variables have the same name
 -- < μ α.< λx.x | ~μ x.< x | ~μ x.< x | ~μ x.< x | α > > > > | ~μ x.< x | □ > >
 ex5 :: Command
 ex5 = Cut (TmMu "α" (Cut idTm (CntMu "x" (Cut (TmVar "x")
@@ -40,13 +41,13 @@ ex5 = Cut (TmMu "α" (Cut idTm (CntMu "x" (Cut (TmVar "x")
                                   (CntMu "x" (Cut (TmVar "x") (CntVar "α")))))))))
           (CntMu "x" (Cut (TmVar "x") CntTop))
 
+-- similar to ex4, but use the outer-most bound prd variable instead of the inner-most
 -- < μ α.< λx.x | ~μ y.< y | ~μ z.< z | ~μ w.< y | α > > > > | ~μ x.< x | □ > >
 ex6 :: Command
 ex6 = Cut (TmMu "α" (Cut idTm (CntMu "y" (Cut (TmVar "y")
                                 (CntMu "z" (Cut (TmVar "z")
                                   (CntMu "w" (Cut (TmVar "y") (CntVar "α")))))))))
           (CntMu "x" (Cut (TmVar "x") CntTop))
--- Command line argument logic
 
 examples :: [(String,Command)]
 examples =  [ ("ex1", ex1)
@@ -57,7 +58,7 @@ examples =  [ ("ex1", ex1)
             , ("ex6", ex6)
             ]
               
-
+-- Command line argument logic
 main :: IO ()
 main = do
     args <- getArgs
