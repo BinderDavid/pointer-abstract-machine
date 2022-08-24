@@ -47,9 +47,8 @@ prettyStack pt1 pt2 (MkStack stack) = unlines (printStackEntry <$> reverse (zip 
 horizontalLine :: String
 horizontalLine = "───────────────────────────────────────────────────────────────────────────────"
 
-
 instance Pretty MachineState where
-    pretty (MkMachineState tm pt1 cnt pt2 stack) =
+    pretty (MkMachineState (CutState tm pt1 cnt pt2) stack) =
         unlines [ "┌" <> horizontalLine 
                 , "│ Term: " <> pretty tm <> "{" <> show pt1 <> "}"
                 , "│ Cont: " <> pretty cnt <> "{" <> show pt2 <> "}"
