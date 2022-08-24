@@ -38,6 +38,7 @@ executable pointer-abstract-machine-exe
   main-is: Main.hs
   other-modules:
       Paths_pointer_abstract_machine
+      Examples
   hs-source-dirs:
       app
   ghc-options:
