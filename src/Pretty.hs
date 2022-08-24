@@ -2,6 +2,7 @@ module Pretty where
 
 import Syntax
 import AbstractMachine.Machine
+import AbstractMachine.Stack
 
 -- Prettyprinting Syntax
 

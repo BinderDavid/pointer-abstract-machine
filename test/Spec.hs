@@ -3,6 +3,7 @@ module Main where
 import Test.Hspec
 
 import AbstractMachine.Machine
+import AbstractMachine.Stack
 
 main :: IO ()
 main = hspec $ do
