@@ -1,4 +1,3 @@
-{-# LANGUAGE GADTs #-}
 module Syntax where
 
 type Var = String

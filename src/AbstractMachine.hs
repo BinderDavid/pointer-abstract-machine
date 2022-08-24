@@ -1,4 +1,3 @@
-{-# LANGUAGE GADTs #-}
 module AbstractMachine where
 
 import Syntax
