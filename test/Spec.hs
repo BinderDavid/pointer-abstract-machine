@@ -2,8 +2,7 @@ module Main where
 
 import Test.Hspec
 
-import AbstractMachine
-import AbstractMachine (topOfStack, emptyStack)
+import AbstractMachine.Machine
 
 main :: IO ()
 main = hspec $ do

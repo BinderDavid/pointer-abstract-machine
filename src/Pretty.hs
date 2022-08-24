@@ -1,7 +1,7 @@
 module Pretty where
 
 import Syntax
-import AbstractMachine
+import AbstractMachine.Machine
 
 -- Prettyprinting Syntax
 

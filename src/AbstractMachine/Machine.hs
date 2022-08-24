@@ -1,4 +1,4 @@
-module AbstractMachine where
+module AbstractMachine.Machine where
 
 import Syntax
 

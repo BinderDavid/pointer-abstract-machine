@@ -3,7 +3,7 @@ module Main where
 import System.Environment (getArgs)
 import System.Exit (exitSuccess)
 
-import AbstractMachine
+import AbstractMachine.Machine
 import Pretty
 import Syntax
 import Examples (examples)

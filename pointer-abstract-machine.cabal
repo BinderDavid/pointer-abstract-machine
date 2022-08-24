@@ -21,7 +21,7 @@ source-repository head
 
 library
   exposed-modules:
-      AbstractMachine
+      AbstractMachine.Machine
       Syntax
       Pretty
   other-modules:
