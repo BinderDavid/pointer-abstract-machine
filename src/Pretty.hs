@@ -29,17 +29,17 @@ instance Pretty StackBinding where
     pretty (TermBinding tm pt) = pretty tm <> "{" <> show pt <> "}"
     pretty (ContinuationBinding cnt pt) = pretty cnt <> "{" <> show pt <> "}"
 
-prettyStack :: Pointer -> Pointer -> Stack -> String
+prettyStack :: StackPointer -> StackPointer -> Stack -> String
 prettyStack pt1 pt2 (MkStack stack) = unlines (printStackEntry <$> reverse (zip [0..] (reverse stack)))
       where
         printStackEntry :: (Int, (Var, StackBinding)) -> String
         printStackEntry (i, (var, bnd)) = "│" <> printTermPt pt1 i <> printContinuationPt pt2 i <> show i <> " ⟼ " <> var <> " : " <> pretty bnd
 
-        printTermPt :: Pointer -> Int -> String
+        printTermPt :: StackPointer -> Int -> String
         printTermPt pt i | pt == i = " • "
                          | otherwise = "   "
 
-        printContinuationPt :: Pointer -> Int -> String
+        printContinuationPt :: StackPointer -> Int -> String
         printContinuationPt pt i | pt == i = " • "
                                  | otherwise = "   "
 

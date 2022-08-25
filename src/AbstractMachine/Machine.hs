@@ -10,7 +10,7 @@ import AbstractMachine.Stack
 data EvalOrder = CBV | CBN deriving (Eq, Ord, Show)
 
 data MachineHead where
-    CutState :: EvalOrder -> Term -> Pointer -> Continuation -> Pointer -> MachineHead
+    CutState :: EvalOrder -> Term -> StackPointer -> Continuation -> StackPointer -> MachineHead
 
 
 -------------------------------------------------------------------------------
