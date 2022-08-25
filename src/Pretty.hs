@@ -3,11 +3,15 @@ module Pretty where
 import Syntax
 import AbstractMachine.Machine
 import AbstractMachine.Stack
+import AbstractMachine.Heap
 
 -- Prettyprinting Syntax
 
 class Pretty a where
     pretty :: a -> String
+
+instance Pretty () where
+    pretty () = "()"
 
 instance Pretty Term where
     pretty (TmVar v) = v
@@ -43,12 +47,17 @@ prettyStack pt1 pt2 (MkStack stack) = unlines (printStackEntry <$> reverse (zip 
         printContinuationPt pt i | pt == i = " • "
                                  | otherwise = "   "
 
+instance Pretty a => Pretty (Heap a) where
+    pretty MkHeap { heap } = unlines (foo <$> heap)
+      where
+        foo :: Pretty a => (HeapPointer, a) -> String
+        foo (pt, a) = show pt <> " ⟼ " <> pretty a
 
 horizontalLine :: String
 horizontalLine = "───────────────────────────────────────────────────────────────────────────────"
 
 instance Pretty MachineState where
-    pretty (MkMachineState (CutState eo tm pt1 cnt pt2) stack) =
+    pretty (MkMachineState (CutState eo tm pt1 cnt pt2) stack hp) =
         unlines [ "┌" <> horizontalLine 
                 , "│ Term: " <> pretty tm <> "{" <> show pt1 <> "}"
                 , "│ Cont: " <> pretty cnt <> "{" <> show pt2 <> "}"
@@ -56,6 +65,9 @@ instance Pretty MachineState where
                 , "├" <> horizontalLine
                 , "│ Stack:"
                 , if null (unStack stack) then "│" else init (prettyStack pt1 pt2 stack)
+                , "├" <> horizontalLine
+                , "│ Heap:"
+                , if null (heap hp) then "│" else pretty hp
                 , "└" <> horizontalLine
                 ]
 
