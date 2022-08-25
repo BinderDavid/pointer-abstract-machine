@@ -1,4 +1,4 @@
-cabal-version: 1.12
+cabal-version: 2.2
 
 name:           pointer-abstract-machine
 version:        0.1.0.0
@@ -8,7 +8,7 @@ bug-reports:    https://github.com/githubuser/pointer-abstract-machine/issues
 author:         Author name here
 maintainer:     example@example.com
 copyright:      2022 Author name here
-license:        BSD3
+license:        BSD-3-Clause
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
@@ -19,7 +19,14 @@ source-repository head
   type: git
   location: https://github.com/githubuser/pointer-abstract-machine
 
+common shared-lang-extensions
+  default-extensions:
+      GADTs
+      NamedFieldPuns
+      ImportQualifiedPost
+
 library
+  import: shared-lang-extensions
   exposed-modules:
       AbstractMachine.Machine
       AbstractMachine.Stack
@@ -28,9 +35,7 @@ library
       Pretty
   other-modules:
       Paths_pointer_abstract_machine
-  default-extensions:
-      GADTs
-      NamedFieldPuns
+  
   hs-source-dirs:
       src
   ghc-options:
@@ -40,6 +45,7 @@ library
   default-language: Haskell2010
 
 executable pointer-abstract-machine-exe
+  import: shared-lang-extensions
   main-is: Main.hs
   other-modules:
       Paths_pointer_abstract_machine
@@ -57,10 +63,13 @@ executable pointer-abstract-machine-exe
   default-language: Haskell2010
 
 test-suite pointer-abstract-machine-test
+  import: shared-lang-extensions
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
       Paths_pointer_abstract_machine
+      Spec.Stack
+      Spec.Heap
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N

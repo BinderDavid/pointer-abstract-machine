@@ -2,12 +2,13 @@ module Main where
 
 import Test.Hspec
 
-import AbstractMachine.Machine
-import AbstractMachine.Stack
+import Spec.Stack (stackSpec)
+import Spec.Heap (heapSpec)
 
 main :: IO ()
 main = hspec $ do
-    describe "Stacks" $ do
-        it "Top of empty stack is the null pointer" $
-          topOfStack emptyStack `shouldBe` 0
+    describe "AbstractMachine.Stack" $ do
+      stackSpec
+    describe "AbstractMachine.Heap" $ do
+      heapSpec
 
