@@ -50,15 +50,11 @@ computeStep (MkMachineState (CutState tm' p1 (CntMu x (Cut tm cnt)) _p2) stack) 
     Right (newState, MuTildeStep)
 -- Evaluating producer variables
 computeStep (MkMachineState (CutState (TmVar x) p1 cnt p2) stack) = do
-    res <- lookupStack p1 stack x
-    case res of
-        TermBinding tm p -> Right (MkMachineState (CutState tm p cnt p2) stack, TermVarStep)
-        ContinuationBinding _ _ -> Left "Tried to lookup term but found continuation"
+    (tm,p) <- lookupTermBinding p1 stack x
+    pure (MkMachineState (CutState tm p cnt p2) stack, TermVarStep)
 -- Evaluating consumer variables
 computeStep (MkMachineState (CutState tm p1 (CntVar x) p2) stack) = do
-    res <- lookupStack p2 stack x
-    case res of
-        ContinuationBinding cnt p -> Right (MkMachineState (CutState tm p1 cnt p) stack, ContinuationVarStep)
-        TermBinding _ _ -> Left "Tried to lookup continuation but found term"
+    (cnt,p) <- lookupContinuationBinding p2 stack x
+    pure (MkMachineState (CutState tm p1 cnt p) stack, ContinuationVarStep)
 computeStep (MkMachineState (CutState _ _ CntTop _) _) =
     Left "Computation finished."

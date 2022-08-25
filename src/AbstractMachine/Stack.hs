@@ -40,3 +40,18 @@ lookupStack pt stack = lookupStack' (restrictStack stack pt)
     lookupStack' (MkStack []) var = Left ("Variable " <> var <> " not in stack.")
     lookupStack' (MkStack ((v,bnd):stack')) v' | v == v' = Right bnd
                                                | otherwise = lookupStack' (MkStack stack') v'
+
+lookupTermBinding :: Pointer -> Stack -> Var -> Either String (Term, Pointer)
+lookupTermBinding pt st var = do
+  res <- lookupStack pt st var
+  case res of
+    TermBinding tm pt' -> pure (tm, pt')
+    ContinuationBinding _ _ -> Left "Tried to lookup term but found continuation"
+
+lookupContinuationBinding :: Pointer -> Stack -> Var -> Either String (Continuation, Pointer)
+lookupContinuationBinding pt st var = do
+  res <- lookupStack pt st var
+  case res of
+    ContinuationBinding cnt pt' -> pure (cnt, pt')
+    TermBinding _ _ -> Left "Tried to lookup term but found continuation"
+    
