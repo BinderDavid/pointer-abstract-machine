@@ -23,12 +23,14 @@ library
   exposed-modules:
       AbstractMachine.Machine
       AbstractMachine.Stack
+      AbstractMachine.Heap
       Syntax
       Pretty
   other-modules:
       Paths_pointer_abstract_machine
   default-extensions:
       GADTs
+      NamedFieldPuns
   hs-source-dirs:
       src
   ghc-options:
