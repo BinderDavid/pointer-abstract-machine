@@ -48,10 +48,11 @@ horizontalLine :: String
 horizontalLine = "───────────────────────────────────────────────────────────────────────────────"
 
 instance Pretty MachineState where
-    pretty (MkMachineState (CutState tm pt1 cnt pt2) stack) =
+    pretty (MkMachineState (CutState eo tm pt1 cnt pt2) stack) =
         unlines [ "┌" <> horizontalLine 
                 , "│ Term: " <> pretty tm <> "{" <> show pt1 <> "}"
                 , "│ Cont: " <> pretty cnt <> "{" <> show pt2 <> "}"
+                , "| EvalOrder: " <> show eo
                 , "├" <> horizontalLine
                 , "│ Stack:"
                 , if null (unStack stack) then "│" else init (prettyStack pt1 pt2 stack)
